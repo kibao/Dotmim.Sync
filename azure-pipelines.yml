@@ -1,3 +1,31 @@
+resources:
+  containers:
+    - container: sqlserver
+      image: mcr.microsoft.com/mssql/sqlserver:latest
+      ports:
+        - 1433:1433
+      env:
+        ACCEPT_EULA: "y"
+        SA_PASSWORD: "Password12!"
+    - container: mysql
+      image: mysql:latest
+      ports:
+        # TODO: choose one
+        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
+        #- 3307:3306
+        - 3306:3306
+      env:
+        MYSQL_ROOT_PASSWORD: "Password12!"
+    - container: mariadb
+      image: mariadb:latest
+      ports:
+        # TODO: choose one
+        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
+        #- 3307:3306
+        - 3308:3306
+      env:
+        MYSQL_ROOT_PASSWORD: "Password12!"
+
 jobs:
   - job: testbasics
     displayName: "Tests Basics"
@@ -32,19 +60,9 @@ jobs:
           version: 6.0.x
           includePreviewVersions: true
 
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
-
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
       # - script: |
       #     docker exec -i sqlserver "bash" & /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "Password12!"
       #   displayName: Try to connect to SQL Server and get databases
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
 
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.StandAlone -f net6.0 --logger trx
         name: standalonetests
@@ -95,17 +113,7 @@ jobs:
         inputs:
           packageType: 'sdk'
           version: 7.0.x
-          includePreviewVersions: true          
-          
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
+          includePreviewVersions: true
 
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.SqlServerTcp -f net6.0 --logger trx
         name: sqlservertcptests
@@ -150,16 +158,6 @@ jobs:
           packageType: 'sdk'
           version: 7.0.x
           includePreviewVersions: true   
-
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
 
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.SqlServerTcp -f netcoreapp3.1 --logger trx
         name: sqlservertcptests
@@ -206,16 +204,6 @@ jobs:
           version: 7.0.x
           includePreviewVersions: true   
 
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
-
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.SqlServerHttp  -f net6.0 --logger trx
         name: sqlservertcptests
         displayName: "SQL Server Http Integration Tests"
@@ -259,16 +247,6 @@ jobs:
           packageType: 'sdk'
           version: 7.0.x
           includePreviewVersions: true   
-
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
 
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.SqlServerHttp -f netcoreapp3.1 --logger trx
         name: sqlservertcptests
@@ -314,16 +292,6 @@ jobs:
           version: 7.0.x
           includePreviewVersions: true   
 
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
-
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.SqlServerChangeTracking -f netcoreapp3.1 --logger trx
         name: sqlservertcptests
         displayName: "SQL Server Change Tracking Integration Tests"
@@ -367,17 +335,7 @@ jobs:
         inputs:
           packageType: 'sdk'
           version: 7.0.x
-          includePreviewVersions: true   
-          
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
+          includePreviewVersions: true
 
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.SqlServerChangeTracking -f net6.0 --logger trx
         name: sqlservertcptests
@@ -423,16 +381,6 @@ jobs:
           version: 7.0.x
           includePreviewVersions: true   
 
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
-
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.MySqlTcp -f net6.0 --logger trx
         name: mysqlintegrationtests
         displayName: "MySql Tcp Integration Tests"
@@ -476,16 +424,6 @@ jobs:
           packageType: 'sdk'
           version: 7.0.x
           includePreviewVersions: true   
-
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
 
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.MySqlTcp  -f netcoreapp3.1 --logger trx
         name: mysqlintegrationtests
@@ -532,16 +470,6 @@ jobs:
           version: 7.0.x
           includePreviewVersions: true   
 
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
-
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.MySqlHttp  -f net6.0 --logger trx
         name: mysqlintegrationtests
         displayName: "MySql Http Integration Tests"
@@ -585,16 +513,6 @@ jobs:
           packageType: 'sdk'
           version: 7.0.x
           includePreviewVersions: true   
-
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
 
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.MySqlHttp -f netcoreapp3.1 --logger trx
         name: mysqlintegrationtests
@@ -641,16 +559,6 @@ jobs:
           version: 7.0.x
           includePreviewVersions: true   
 
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
-
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.MariaDBTcp -f net6.0 --logger trx
         name: mariadbintegrationtests
         displayName: "MariaDB Tcp Integration Tests"
@@ -694,16 +602,6 @@ jobs:
           packageType: 'sdk'
           version: 7.0.x
           includePreviewVersions: true   
-
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
 
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.MariaDBTcp -f netcoreapp3.1 --logger trx
         name: mariadbintegrationtests
@@ -749,16 +647,6 @@ jobs:
           version: 7.0.x
           includePreviewVersions: true   
 
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
-
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.MariaDBHttp -f netcoreapp3.1 --logger trx
         name: mariadbintegrationtests
         displayName: "MariaDB Http Integration Tests"
@@ -802,16 +690,6 @@ jobs:
           packageType: 'sdk'
           version: 7.0.x
           includePreviewVersions: true   
-
-      - script: docker run --name sqlserver -e ACCEPT_EULA=Y -e SA_PASSWORD=Password12! -p 1433:1433 -d mcr.microsoft.com/mssql/server
-        displayName: "Run SQL Server latest on Linux container"
- 
-        # Seems the 3306 is already in use on the machine used by Azure Devops, so redirect to 3307
-      - script: docker run --name mysql -e MYSQL_ROOT_PASSWORD=Password12! -p 3307:3306 -d mysql
-        displayName: "Run MySql on Linux container"
-
-      - script: docker run --name mariadb -e MYSQL_ROOT_PASSWORD=Password12! -p 3308:3306 -d mariadb:latest
-        displayName: "Run MariaDB on Linux container"
 
       - script: dotnet test Tests/Dotmim.Sync.Tests/Dotmim.Sync.Tests.csproj --filter Dotmim.Sync.Tests.IntegrationTests.MariaDBHttp -f net6.0 --logger trx
         name: mariadbintegrationtests
